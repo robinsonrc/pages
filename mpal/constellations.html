@@ -1,0 +1,185 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Memory Palace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            padding: 80px 0;
+        }
+        
+        #card-container {
+            width: calc(100% - 40px);
+            height: calc(100% - 40px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #card-content {
+            font-size: 20px;
+            line-height: 1.5;
+            text-align: center;
+            color: #333;
+            white-space: pre-line;
+        }
+        
+        #card-content.title {
+            font-weight: 600;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="card-container">
+        <div id="card-content"></div>
+    </div>
+
+    <script>
+        const cards = [
+            "Constellations",
+            "1\n\nAndromeda\n\nThe Chained Maiden\n\nN\n\nAlpheratz",
+            "2\n\nAntlia\n\nThe Air Pump\n\nS\n\nAlpha Antliae",
+            "3\n\nApus\n\nThe Bird of Paradise\n\nS\n\nAlpha Apodis",
+            "4\n\nAquarius\n\nThe Water Bearer\n\nS (Z)\n\nSadalsuud",
+            "5\n\nAquila\n\nThe Eagle\n\nN\n\nAltair",
+            "6\n\nAra\n\nThe Altar\n\nS\n\nBeta Arae",
+            "7\n\nAries\n\nThe Ram\n\nN (Z)\n\nHamal",
+            "8\n\nAuriga\n\nThe Charioteer\n\nN\n\nCapella",
+            "9\n\nBoötes\n\nThe Herdsman\n\nN\n\nArcturus",
+            "10\n\nCaelum\n\nThe Engraving\n\nS\n\nAlpha Caeli",
+            "11\n\nCamelopardalis\n\nThe Giraffe\n\nN\n\nBeta Camelopardalis",
+            "12\n\nCancer\n\nThe Crab\n\nN (Z)\n\nTarf",
+            "13\n\nCanes Venatici\n\nThe Hunting Dogs\n\nN\n\nCor Caroli",
+            "14\n\nCanis Major\n\nThe Greater Dog\n\nS\n\nSirius",
+            "15\n\nCanis Minor\n\nThe Lesser Dog\n\nN\n\nProcyon",
+            "16\n\nCapricornus\n\nThe Sea Goat\n\nS (Z)\n\nDeneb Algedi",
+            "17\n\nCarina\n\nThe Keel\n\nS\n\nCanopus",
+            "18\n\nCassiopeia\n\nThe Seated Queen\n\nN\n\nSchedar",
+            "19\n\nCentaurus\n\nThe Centaur\n\nS\n\nRigel Kentaurus",
+            "20\n\nCepheus\n\nThe King\n\nN\n\nAlderamin",
+            "21\n\nCetus\n\nThe Sea Monster\n\nS\n\nDiphda",
+            "22\n\nChamaeleon\n\nThe Chameleon\n\nS\n\nAlpha Chamaeleontis",
+            "23\n\nCircinus\n\nThe Compass\n\nS\n\nAlpha Circini",
+            "24\n\nColumba\n\nThe Dove\n\nS\n\nPhact",
+            "25\n\nComa Berenices\n\nBerenice's Hair\n\nN\n\nBeta Comae Berenices",
+            "26\n\nCorona Australis\n\nThe Southern Crown\n\nS\n\nMeridiana",
+            "27\n\nCorona Borealis\n\nThe Northern Crown\n\nN\n\nAlphecca",
+            "28\n\nCorvus\n\nThe Crow\n\nS\n\nGienah",
+            "29\n\nCrater\n\nThe Cup\n\nS\n\nLabrum",
+            "30\n\nCrux\n\nThe Southern Cross\n\nS\n\nAcrux",
+            "31\n\nCygnus\n\nThe Swan\n\nN\n\nDeneb",
+            "32\n\nDelphinus\n\nThe Dolphin\n\nN\n\nRotanev",
+            "33\n\nDorado\n\nThe Goldfish\n\nS\n\nAlpha Doradus",
+            "34\n\nDraco\n\nThe Dragon\n\nN\n\nEltanin",
+            "35\n\nEquuleus\n\nThe Little Horse\n\nN\n\nKitalpha",
+            "36\n\nEridanus\n\nThe River\n\nS\n\nAchernar",
+            "37\n\nFornax\n\nThe Furnace\n\nS\n\nDalim",
+            "38\n\nGemini\n\nThe Twins\n\nN (Z)\n\nPollux",
+            "39\n\nGrus\n\nThe Crane\n\nS\n\nAlnair",
+            "40\n\nHercules\n\nHercules\n\nN\n\nKornephoros",
+            "41\n\nHorologium\n\nThe Clock\n\nS\n\nAlpha Horologii",
+            "42\n\nHydra\n\nThe Female Water Snake\n\nS\n\nAlphard",
+            "43\n\nHydrus\n\nThe Male Water Snake\n\nS\n\nBeta Hydri",
+            "44\n\nIndus\n\nThe Indian\n\nS\n\nAlpha Indi",
+            "45\n\nLacerta\n\nThe Lizard\n\nN\n\nAlpha Lacertae",
+            "46\n\nLeo\n\nThe Lion\n\nN (Z)\n\nRegulus",
+            "47\n\nLeo Minor\n\nThe Lesser Lion\n\nN\n\n46 Leonis Minoris",
+            "48\n\nLepus\n\nThe Hare\n\nS\n\nArneb",
+            "49\n\nLibra\n\nThe Scales\n\nS (Z)\n\nZubeneschamali",
+            "50\n\nLupus\n\nThe Wolf\n\nS\n\nAlpha Lupi",
+            "51\n\nLynx\n\nThe Lynx\n\nN\n\nAlpha Lyncis",
+            "52\n\nLyra\n\nThe Lyre\n\nN\n\nVega",
+            "53\n\nMensa\n\nThe Table Mountain\n\nS\n\nAlpha Mensae",
+            "54\n\nMicroscopium\n\nThe Microscope\n\nS\n\nGamma Microscopii",
+            "55\n\nMonoceros\n\nThe Unicorn\n\nN\n\nBeta Monocerotis",
+            "56\n\nMusca\n\nThe Fly\n\nS\n\nAlpha Muscae",
+            "57\n\nNorma\n\nThe Carpenter's Square\n\nS\n\nGamma-2 Normae",
+            "58\n\nOctans\n\nThe Octant\n\nS\n\nNu Octantis",
+            "59\n\nOphiuchus\n\nThe Serpent Bearer\n\nS (Z)\n\nRasalhague",
+            "60\n\nOrion\n\nThe Hunter\n\nN\n\nRigel",
+            "61\n\nPavo\n\nThe Peacock\n\nS\n\nPeacock",
+            "62\n\nPegasus\n\nThe Winged Horse\n\nN\n\nEnif",
+            "63\n\nPerseus\n\nThe Hero\n\nN\n\nMirfak",
+            "64\n\nPhoenix\n\nThe Phoenix\n\nS\n\nAnkaa",
+            "65\n\nPictor\n\nThe Painter's Easel\n\nS\n\nAlpha Pictoris",
+            "66\n\nPisces\n\nThe Fishes\n\nN (Z)\n\nAlpherg",
+            "67\n\nPiscis Austrinus\n\nThe Southern Fish\n\nS\n\nFomalhaut",
+            "68\n\nPuppis\n\nThe Stern\n\nS\n\nNaos",
+            "69\n\nPyxis\n\nThe Mariner's Compass\n\nS\n\nAlpha Pyxidis",
+            "70\n\nReticulum\n\nThe Reticle\n\nS\n\nAlpha Reticuli",
+            "71\n\nSagitta\n\nThe Arrow\n\nN\n\nGamma Sagittae",
+            "72\n\nSagittarius\n\nThe Archer\n\nS (Z)\n\nKaus Australis",
+            "73\n\nScorpius\n\nThe Scorpion\n\nS (Z)\n\nAntares",
+            "74\n\nSculptor\n\nThe Sculptor\n\nS\n\nAlpha Sculptoris",
+            "75\n\nScutum\n\nThe Shield\n\nS\n\nAlpha Scuti",
+            "76\n\nSerpens\n\nThe Serpent\n\nN\n\nUnukalhai",
+            "77\n\nSextans\n\nThe Sextant\n\nS\n\nAlpha Sextantis",
+            "78\n\nTaurus\n\nThe Bull\n\nN (Z)\n\nAldebaran",
+            "79\n\nTelescopium\n\nThe Telescope\n\nS\n\nAlpha Telescopii",
+            "80\n\nTriangulum\n\nThe Triangle\n\nN\n\nBeta Trianguli",
+            "81\n\nTriangulum Australe\n\nThe Southern Triangle\n\nS\n\nAtria",
+            "82\n\nTucana\n\nThe Toucan\n\nS\n\nAlpha Tucanae",
+            "83\n\nUrsa Major\n\nThe Great Bear\n\nN\n\nAlioth",
+            "84\n\nUrsa Minor\n\nThe Little Bear\n\nN\n\nPolaris",
+            "85\n\nVela\n\nThe Sails\n\nS\n\nRegor",
+            "86\n\nVirgo\n\nThe Maiden\n\nS (Z)\n\nSpica",
+            "87\n\nVolans\n\nThe Flying Fish\n\nS\n\nGamma-2 Volantis",
+            "88\n\nVulpecula\n\nThe Fox\n\nN\n\nAnser",
+        ];
+
+        let currentCard = 0;
+        const cardEl = document.getElementById('card-content');
+        const container = document.getElementById('card-container');
+
+        function displayCard() {
+            if (currentCard < cards.length) {
+                cardEl.textContent = cards[currentCard];
+                if (currentCard === 0) {
+                    cardEl.classList.add('title');
+                } else {
+                    cardEl.classList.remove('title');
+                }
+            }
+        }
+
+        function handleTap() {
+            if (currentCard < cards.length - 1) {
+                currentCard++;
+                displayCard();
+            }
+        }
+        container.addEventListener('click', handleTap);
+        
+        document.title = cards[0];
+        displayCard();
+    </script>
+</body>
+</html>
+
