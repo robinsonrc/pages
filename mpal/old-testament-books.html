@@ -1,0 +1,136 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Memory Palace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            padding: 80px 0;
+        }
+        
+        #card-container {
+            width: calc(100% - 40px);
+            height: calc(100% - 40px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #card-content {
+            font-size: 20px;
+            line-height: 1.5;
+            text-align: center;
+            color: #333;
+            white-space: pre-line;
+        }
+        
+        #card-content.title {
+            font-weight: 600;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div id="card-container">
+        <div id="card-content"></div>
+    </div>
+
+    <script>
+        const cards = [
+            "Books of the Old Testament",
+            "1\n\nGenesis",
+            "2\n\nExodus",
+            "3\n\nLeviticus",
+            "4\n\nNumbers",
+            "5\n\nDeuteronomy",
+            "6\n\nJoshua",
+            "7\n\nJudges",
+            "8\n\nRuth",
+            "9\n\n1 Samuel",
+            "10\n\n2 Samuel",
+            "11\n\n1 Kings",
+            "12\n\n2 Kings",
+            "13\n\n1 Chronicles",
+            "14\n\n2 Chronicles",
+            "15\n\nEzra",
+            "16\n\nNehemiah",
+            "17\n\nEsther",
+            "18\n\nJob",
+            "19\n\nPsalms",
+            "20\n\nProverbs",
+            "21\n\nEcclesiastes",
+            "22\n\nSong of Solomon",
+            "23\n\nIsaiah",
+            "24\n\nJeremiah",
+            "25\n\nLamentations",
+            "26\n\nEzekiel",
+            "27\n\nDaniel",
+            "28\n\nHosea",
+            "29\n\nJoel",
+            "30\n\nAmos",
+            "31\n\nObadiah",
+            "32\n\nJonah",
+            "33\n\nMicah",
+            "34\n\nNahum",
+            "35\n\nHabakkuk",
+            "36\n\nZephaniah",
+            "37\n\nHaggai",
+            "38\n\nZechariah",
+            "39\n\nMalachi",
+        ];
+
+        let currentCard = 0;
+        const cardEl = document.getElementById('card-content');
+        const container = document.getElementById('card-container');
+
+        function displayCard() {
+            if (currentCard < cards.length) {
+                cardEl.textContent = cards[currentCard];
+                if (currentCard === 0) {
+                    cardEl.classList.add('title');
+                } else {
+                    cardEl.classList.remove('title');
+                }
+            }
+        }
+
+        function handleTap() {
+            if (currentCard < cards.length - 1) {
+                currentCard++;
+                displayCard();
+            }
+        }
+        container.addEventListener('click', handleTap);
+        
+        document.title = cards[0];
+        displayCard();
+    </script>
+</body>
+</html>
+
