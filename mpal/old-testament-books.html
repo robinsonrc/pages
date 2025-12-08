@@ -63,6 +63,7 @@
 
     <script>
         const cards = [
+            "Books of the Old Testament\n\n\n",
             "Books of the Old Testament\n\n39 Items",
             "1\n\nGenesis",
             "2\n\nExodus",
@@ -112,7 +113,7 @@
         function displayCard() {
             if (currentCard < cards.length) {
                 cardEl.textContent = cards[currentCard];
-                if (currentCard === 0) {
+                if (currentCard === 0 || currentCard === 1) {
                     cardEl.classList.add('title');
                 } else {
                     cardEl.classList.remove('title');

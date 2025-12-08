@@ -63,6 +63,7 @@
 
     <script>
         const cards = [
+            "Lineage from God to Jesus\n\n\n",
             "Lineage from God to Jesus\n\n75 Items",
             "1\n\nAdam",
             "2\n\nSeth",
@@ -148,7 +149,7 @@
         function displayCard() {
             if (currentCard < cards.length) {
                 cardEl.textContent = cards[currentCard];
-                if (currentCard === 0) {
+                if (currentCard === 0 || currentCard === 1) {
                     cardEl.classList.add('title');
                 } else {
                     cardEl.classList.remove('title');

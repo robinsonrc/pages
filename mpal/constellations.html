@@ -63,6 +63,7 @@
 
     <script>
         const cards = [
+            "Constellations\n\n\n",
             "Constellations\n\n88 Items",
             "1\n\nAndromeda\n\nThe Chained Maiden\n\nN\n\nAlpheratz",
             "2\n\nAntlia\n\nThe Air Pump\n\nS\n\nAlpha Antliae",
@@ -161,7 +162,7 @@
         function displayCard() {
             if (currentCard < cards.length) {
                 cardEl.textContent = cards[currentCard];
-                if (currentCard === 0) {
+                if (currentCard === 0 || currentCard === 1) {
                     cardEl.classList.add('title');
                 } else {
                     cardEl.classList.remove('title');
