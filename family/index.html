@@ -1,22 +1,818 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <meta charset="utf-8">
+    <meta name="referrer" content="no-referrer">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard</title>
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#12344d">
+    <title>Useful links</title>
+    <meta
+      name="description"
+      content="A simple home page with useful links, the date, time and Swansea weather."
+    >
     <style>
+      :root {
+        color-scheme: light;
+        --ink: #102a3a;
+        --muted: #425d6c;
+        --navy: #12344d;
+        --navy-dark: #09283d;
+        --cream: #fffdf7;
+        --paper: #ffffff;
+        --page: #eaf0f3;
+        --yellow: #ffd166;
+        --focus: #e55400;
+        --border: #193c51;
+        font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        display: grid;
+        min-width: 320px;
         min-height: 100vh;
         margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font-size: 20px;
+        line-height: 1.4;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .page {
+        width: min(1500px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 40px;
+      }
+
+      .top-panel {
+        display: grid;
+        grid-template-columns: minmax(290px, 1.25fr) 210px minmax(320px, 1fr);
+        align-items: stretch;
+        overflow: hidden;
+        border: 3px solid var(--navy-dark);
+        border-radius: 18px;
+        background: var(--paper);
+        box-shadow: 0 7px 0 rgb(9 40 61 / 14%);
+      }
+
+      .welcome {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 26px 30px;
+        background: var(--navy);
+        color: #ffffff;
+      }
+
+      .date {
+        margin: 0;
+        color: var(--yellow);
+        font-size: clamp(1.7rem, 2.7vw, 2.35rem);
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .clock-panel {
+        display: grid;
         place-items: center;
-        font-family: system-ui, sans-serif;
+        align-content: center;
+        gap: 7px;
+        padding: 14px;
+        background: var(--cream);
+        border-right: 2px solid #c5d1d7;
+      }
+
+      .clock-face {
+        position: relative;
+        width: 128px;
+        aspect-ratio: 1;
+        border: 6px solid var(--navy);
+        border-radius: 50%;
+        background: #ffffff;
+        box-shadow: inset 0 0 0 2px #b8c6ce;
+      }
+
+      .clock-number {
+        position: absolute;
+        z-index: 1;
+        color: var(--navy-dark);
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .n12 { left: 50%; top: 7px; transform: translateX(-50%); }
+      .n3 { right: 8px; top: 50%; transform: translateY(-50%); }
+      .n6 { bottom: 7px; left: 50%; transform: translateX(-50%); }
+      .n9 { left: 8px; top: 50%; transform: translateY(-50%); }
+
+      .hand {
+        position: absolute;
+        z-index: 2;
+        bottom: 50%;
+        left: calc(50% - 3px);
+        width: 6px;
+        border-radius: 999px;
+        background: var(--navy-dark);
+        transform: rotate(0deg);
+        transform-origin: 50% 100%;
+      }
+
+      .hour-hand {
+        height: 33px;
+      }
+
+      .minute-hand {
+        height: 46px;
+        width: 4px;
+        left: calc(50% - 2px);
+        background: #d34a00;
+      }
+
+      .clock-centre {
+        position: absolute;
+        z-index: 3;
+        top: 50%;
+        left: 50%;
+        width: 13px;
+        height: 13px;
+        border: 3px solid #ffffff;
+        border-radius: 50%;
+        background: var(--navy-dark);
+        transform: translate(-50%, -50%);
+      }
+
+      .digital-time {
+        margin: 0;
+        color: var(--navy-dark);
+        font-size: 1.35rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.04em;
+      }
+
+      .weather {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-content: center;
+        column-gap: 16px;
+        padding: 22px 26px;
+      }
+
+      .weather-icon {
+        grid-row: 1 / 4;
+        align-self: center;
+        width: 68px;
+        text-align: center;
+        font-size: 3.25rem;
+        line-height: 1;
+      }
+
+      .weather h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        line-height: 1.2;
+      }
+
+      .weather-now {
+        margin: 4px 0 2px;
+        font-size: 1.45rem;
+        font-weight: 800;
+      }
+
+      .weather-detail,
+      .weather-error {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+        font-weight: 650;
+      }
+
+      .weather-error {
+        color: #7a2f08;
+      }
+
+      .weather-link {
+        display: inline-block;
+        margin-top: 8px;
+        color: #074d82;
+        font-size: 0.9rem;
+        font-weight: 750;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+      }
+
+      .weather-links {
+        grid-column: 2;
+      }
+
+      .weather-credit {
+        margin-left: 5px;
+        color: var(--muted);
+        font-size: 0.72rem;
+        white-space: nowrap;
+      }
+
+      .web-search {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        margin-top: 26px;
+        border: 3px solid var(--navy-dark);
+        border-radius: 14px;
+        background: var(--paper);
+        box-shadow: 0 4px 0 rgb(16 42 58 / 12%);
+      }
+
+      .search-input {
+        min-width: 0;
+        min-height: 72px;
+        padding: 14px 22px;
+        border: 0;
+        border-radius: 11px 0 0 11px;
+        background: var(--paper);
+        color: var(--navy-dark);
+        font: inherit;
+        font-size: 1.3rem;
+        font-weight: 650;
+      }
+
+      .search-input::placeholder {
+        color: #536b78;
+        opacity: 1;
+      }
+
+      .search-input:focus {
+        outline: 5px solid var(--focus);
+        outline-offset: 2px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .search-button {
+        min-width: 154px;
+        padding: 12px 26px;
+        border: 0;
+        border-left: 3px solid var(--navy-dark);
+        border-radius: 0 10px 10px 0;
+        background: var(--navy);
+        color: #ffffff;
+        font: inherit;
+        font-size: 1.2rem;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .search-button:hover {
+        background: var(--navy-dark);
+      }
+
+      .search-button:focus-visible {
+        outline: 5px solid var(--focus);
+        outline-offset: 4px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .links-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      .bookmark {
+        --accent: #2f6c8c;
+        display: grid;
+        grid-template-columns: 100px 1fr auto;
+        align-items: center;
+        min-height: 106px;
+        overflow: hidden;
+        border: 3px solid var(--border);
+        border-left: 12px solid var(--accent);
+        border-radius: 14px;
+        background: var(--paper);
+        box-shadow: 0 4px 0 rgb(16 42 58 / 12%);
+        text-decoration: none;
+      }
+
+      .bookmark:hover {
+        background: #fff8df;
+      }
+
+      .bookmark:focus-visible,
+      .weather-link:focus-visible {
+        outline: 5px solid var(--focus);
+        outline-offset: 4px;
+      }
+
+      .bookmark-icon {
+        display: grid;
+        place-items: center;
+        min-width: 0;
+        padding: 8px;
+      }
+
+      .bookmark-icon img {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 78px;
+        max-height: 56px;
+      }
+
+      .bookmark-text {
+        padding: 16px 8px;
+      }
+
+      .bookmark-title,
+      .bookmark-description {
+        display: block;
+      }
+
+      .bookmark-title {
+        color: var(--navy-dark);
+        font-size: 1.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .bookmark-description {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 650;
+      }
+
+      .bookmark-arrow {
+        padding: 0 22px 0 12px;
+        color: var(--accent);
+        font-size: 2rem;
+        font-weight: 900;
+      }
+
+      .yahoo { --accent: #6001d2; }
+      .calendar { --accent: #1769c2; }
+      .doctor { --accent: #007f3b; }
+      .tesco { --accent: #00539f; }
+      .sainsburys { --accent: #b84b00; }
+      .bbc { --accent: #bb1919; }
+
+      .noscript-note {
+        max-width: 760px;
+        margin: 16px auto 0;
+        padding: 12px 16px;
+        border: 2px solid #915002;
+        border-radius: 8px;
+        background: #fff3c4;
+        color: #542e00;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      @media (min-width: 1020px) {
+        .links-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 1020px) and (min-height: 681px) {
+        .top-panel {
+          min-height: clamp(200px, 24vh, 270px);
+        }
+
+        .bookmark {
+          min-height: clamp(112px, 19vh, 200px);
+        }
+
+        .bookmark-title {
+          font-size: clamp(1.5rem, calc(1.2rem + 0.55vw), 1.7rem);
+        }
+
+        .bookmark-description {
+          font-size: clamp(0.9rem, calc(0.75rem + 0.25vw), 1rem);
+        }
+      }
+
+      @media (min-width: 901px) and (max-height: 680px) {
+        .page {
+          padding-block: 14px 18px;
+        }
+
+        .welcome {
+          padding: 18px 24px;
+        }
+
+        .clock-panel {
+          gap: 5px;
+          padding: 10px;
+        }
+
+        .clock-face {
+          width: 106px;
+        }
+
+        .hour-hand {
+          height: 28px;
+        }
+
+        .minute-hand {
+          height: 38px;
+        }
+
+        .digital-time {
+          font-size: 1.1rem;
+        }
+
+        .weather {
+          column-gap: 12px;
+          padding: 14px 20px;
+        }
+
+        .weather-icon {
+          width: 60px;
+          font-size: 2.65rem;
+        }
+
+        .weather-now {
+          font-size: 1.25rem;
+        }
+
+        .web-search {
+          margin-top: 14px;
+        }
+
+        .search-input {
+          min-height: 60px;
+          padding-block: 10px;
+        }
+
+        .links-grid {
+          gap: 12px;
+          margin-top: 12px;
+        }
+
+        .bookmark {
+          min-height: 90px;
+        }
+
+        .bookmark-text {
+          padding-block: 10px;
+        }
+      }
+
+      @media (max-width: 900px) {
+        .top-panel {
+          grid-template-columns: 1fr 190px;
+        }
+
+        .weather {
+          grid-column: 1 / -1;
+          border-top: 2px solid #c5d1d7;
+        }
+
+        .clock-panel {
+          border-right: 0;
+        }
+      }
+
+      @media (max-width: 680px) {
+        body {
+          font-size: 18px;
+        }
+
+        .page {
+          width: min(100% - 24px, 540px);
+          padding-top: 12px;
+        }
+
+        .top-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .welcome {
+          padding: 24px;
+          text-align: center;
+        }
+
+        .clock-panel {
+          padding: 18px;
+          border-top: 2px solid #c5d1d7;
+        }
+
+        .weather {
+          padding: 20px;
+        }
+
+        .search-input {
+          min-height: 66px;
+          padding-inline: 16px;
+          font-size: 1.1rem;
+        }
+
+        .search-button {
+          min-width: 112px;
+          padding-inline: 18px;
+          font-size: 1.05rem;
+        }
+
+        .links-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .bookmark {
+          min-height: 96px;
+        }
+      }
+
+      @media (forced-colors: active) {
+        .bookmark,
+        .top-panel {
+          box-shadow: none;
+        }
+
+        .date {
+          color: CanvasText;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>Hello</h1>
+    <main class="page">
+      <h1 class="visually-hidden">Useful links</h1>
+      <section class="top-panel" aria-label="Date, time and weather">
+        <div class="welcome">
+          <p class="date" id="today">Today's date</p>
+        </div>
+
+        <div class="clock-panel">
+          <div class="clock-face" id="clock-face" role="img" aria-label="Current time">
+            <span class="clock-number n12" aria-hidden="true">12</span>
+            <span class="clock-number n3" aria-hidden="true">3</span>
+            <span class="clock-number n6" aria-hidden="true">6</span>
+            <span class="clock-number n9" aria-hidden="true">9</span>
+            <span class="hand hour-hand" id="hour-hand" aria-hidden="true"></span>
+            <span class="hand minute-hand" id="minute-hand" aria-hidden="true"></span>
+            <span class="clock-centre" aria-hidden="true"></span>
+          </div>
+          <p class="digital-time" id="digital-time">--:--</p>
+        </div>
+
+        <div class="weather" id="weather">
+          <div class="weather-icon" id="weather-icon" aria-hidden="true">◌</div>
+          <h2>Swansea weather</h2>
+          <p class="weather-now" id="weather-now">Loading weather…</p>
+          <p class="weather-detail" id="weather-detail">Please wait a moment</p>
+          <div class="weather-links">
+            <a class="weather-link" href="https://www.bbc.co.uk/weather/2636432">Full BBC forecast</a>
+            <a class="weather-credit" href="https://open-meteo.com/">Data by Open-Meteo</a>
+          </div>
+        </div>
+      </section>
+
+      <form class="web-search" action="https://www.bing.com/search" method="get" role="search">
+        <label class="visually-hidden" for="web-search-input">Search the internet</label>
+        <input
+          class="search-input"
+          id="web-search-input"
+          name="q"
+          type="search"
+          placeholder="Search the internet"
+          autocomplete="off"
+          enterkeyhint="search"
+          required
+        >
+        <button class="search-button" type="submit">Search</button>
+      </form>
+
+      <nav class="links-grid" aria-label="Useful websites">
+        <a class="bookmark yahoo" href="https://mail.yahoo.com/d/folders/1">
+          <span class="bookmark-icon" aria-hidden="true">
+            <img src="data:image/x-icon;base64,AAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAACMuAAAjLgAAAAAAAAAAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7/f//7vT//+fw///t9P//+/z/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////6fH//5rA//9fnP//TI///12a//+Wvv//5O7//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+vy//90qf//L37//y18//8tfP//LXz//y59//9pov//4ez/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////o8b//zB+//8tff//Ln3//y59//8uff//Ln3//y18//+Lt///+vz///////////////////////////////////////////////////////////////////////////////////////////////////////////////////X5//9pov//LHz//y59//8uff//Ln3//y59//8uff//LXz//02R///q8v//////////////////////////////////////////////////////////////////////////////////////////////////////////////////8/f//1qY//8sfP//Ln3//y59//8uff//Ln3//y59//8tfP//Pof//93q///////////////////////////////////////////////////////////////////////////////////////////////////////////////////3+v//cqj//yx8//8uff//Ln3//y59//8uff//Ln3//y18//9Jjv//5/D///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+z0P//NoH//y18//8uff//Ln3//y59//8uff//LXz//3+w///4+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////P4//+Mt///NID//yx8//8re///K3v//y18//9dmv//2Of///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////P3//+vzf//aKH//1CS//9ZmP//jbj//9zq//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7////6/P//8vf///b6///9/v//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////5O7//7HO//+vzf//r83//6/N//+vzf//r83//67N///E2v///P3////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////W5v//S4///y19//8vfv//L37//y9+//8vfv//LX3//0yQ///f6/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////v9//99rv//LXz//y59//8uff//Ln3//y59//8tff//Mn///6DE/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8Ta//84g///Ln3//y59//8uff//Ln3//y59//8re///YZ3//+vy////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7vX//2ag//8se///Ln3//y59//8uff//Ln3//y59//82gv//vdb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////psj//zOA//8tff//Ln3//y59//8uff//Ln3//yx8//93qv//+vz////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////i7f//UJP//yx8//8uff//Ln3//y59//8uff//LHz//0WL///S4/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7+//+Mt///LXz//y59//8uff//Ln3//y59//8uff//L33//5S8///9/v///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////87h//8+iP//LX3//y59//8uff//Ln3//y59//8sfP//VJX//+Xv////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8/j//3Oo//8se///Ln3//y59//8uff//Ln3//y59//8zgP//r87/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////tND//zeC//8tfP//Ln3//y59//8uff//Ln3//yx8//9spP//9fn////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////s8///WZf//yx8//8uff//Ln3//y59//8uff//LXz//z+I///H3P////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7+//+bwP//Ln3//y59//8uff//Ln3//y59//8uff//LHz//4e1///6/P///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9bm//9Jjf//LHz//y59//8uff//Ln3//y59//8tfP//So7//9/r////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+vz//3+v//8sfP//Ln3//y59//8uff//Ln3//y59//8xf///ocT/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wtn//zqE//8tff//Ln3//y59//8uff//Ln3//yt7//9inf//7PP////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////w9v//ZJ///yt7//8tfP//LXz//y18//8tfP//LHz//zeD//+81f////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+uzf//SY3//0iN//9Ijf//SI3//0iN//9Ijf//Roz//4+5///6/P////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////b6///m7///5e///+Xv///l7///5e///+Xv///l7///6/P///7+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" alt="">
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Yahoo Mail</span>
+            <span class="bookmark-description">Read and send email</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark calendar" href="https://calendar.google.com/calendar/u/0/r">
+          <span class="bookmark-icon" aria-hidden="true">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABDlBMVEUAAABAg/NChfUyeOcaaNIZZ9EZZtJAh+9BhfRChfQyeugZZ9IZZ9MYaM9ChfQZZ9JDg/IYaNNBg/NBhPIYZ9KJs/i40fuyvbimnFGgmlf////+5aH7vAT8vAXP4PyVuvhlnPZZlPVxo/fn7/7D2PuUuvmVuvnz9/6Is/hxo/agwvpalPXb6P2Vu/jc6P19q/jo8P7n8P59q/esyvpOjPWgwvl9qvfQ4PyhwvnE2ftOjfWsyvtmnPaJsvhNjPWtyvrE2Pswg6cyg62Au7iz3r/KvXr6hRD6ihAYgDgYgDgqmUk0qFN9eUL3KiX4KSX/ICAYgDgYgDgYgDgXgDkWgDYXgDkYgDgomEg1qFOCdUBZSPkrAAAAWnRSTlMAQJ+fn5BQIL/////PIM+/UECQoJ//////n////5///////////////////////////////////////////////6D//////5Cg///////PEEC/IM9QkJ+fn5/9kq+gAAABeElEQVR4Ae3VhVLEQBBFURwerivNursL7u4u//8jVFetBZsK0/jcWFlOPNP1wzKZunts1NvXqn/gVW5wCHYaHulodOwVcBwfBLmJl94kdMCRqRfgtB7Y/wKc0QNn/yVoQAPOORQ5XZbcKtBBiuY9lrwG/MWgzx8IhvxhahVx+HTAKAAu1uDiCSCpAaYAi+hLQwvMAMjGKZcHUGicrxZYLGGOuBBQpngIQEUHZLJIXAKoEvmBrEMTbFTjM6R4sk4iICsoEicA5qr+EIAFkgId4BZJGEznxMBivV4OAks5GbCRHwiJgnEABQkws9wQg0BGAAwBdeLCfIYyYDrMV7wCBEkAzFUArFb9vHFIgLw7J/ilFJPg1tZJBmRyo+qom3H5j4CbW5a2dxTt7lnafwEeHFo6OlZ0ctrZ2bkoyJ4kyJ4kyJ4kyJ4kyJ4kyJ4kyJ4kyJ4kyJ4cqPC6LuyDLz1Ll3ZBhdd1dW0PZE/Rze1dq/sHRY/smUw/tCdnzuasx0N6SQAAAABJRU5ErkJggg==" alt="">
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Google Calendar</span>
+            <span class="bookmark-description">View appointments and events</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark doctor" href="https://my.askmygp.uk/?c=w98022#/intro">
+          <span class="bookmark-icon" aria-hidden="true">
+            <img src="data:image/png;base64,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" alt="">
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Doctor's Surgery</span>
+            <span class="bookmark-description">Contact the surgery with AskMyGP</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark tesco" href="https://www.tesco.com/groceries/en-GB/">
+          <span class="bookmark-icon" aria-hidden="true">
+            <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSI2NzguMDAyODYiIGhlaWdodD0iMTkyLjQ2Mjc1IiB2aWV3Qm94PSIwLDAsNjc4LjAwMjg2LDE5Mi40NjI3NSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTkuMDAxNDIsLTgzLjc2ODYyKSI+PGcgZGF0YS1wYXBlci1kYXRhPSJ7JnF1b3Q7aXNQYWludGluZ0xheWVyJnF1b3Q7OnRydWV9IiBzdHJva2U9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIHN0cm9rZS1kYXNoYXJyYXk9IiIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjAiIHN0eWxlPSJtaXgtYmxlbmQtbW9kZTogbm9ybWFsIj48cGF0aCBkPSIiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHBhdGggZD0iIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9IiIgZmlsbD0iIzAwMDAwMCIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSIiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHBhdGggZD0iIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9IiIgZmlsbD0iIzAwMDAwMCIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSIiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHBhdGggZD0iIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9IiIgZmlsbD0iIzAwMDAwMCIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSIiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlLXdpZHRoPSIxIi8+PHBhdGggZD0iIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZS13aWR0aD0iMSIvPjxwYXRoIGQ9IiIgZmlsbD0iIzAwMDAwMCIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSIiIGZpbGw9IiMwMDAwMDAiIGZpbGwtcnVsZT0ibm9uemVybyIgc3Ryb2tlLXdpZHRoPSIxIi8+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2Utd2lkdGg9IjguMzEzNTkiPjxwYXRoIGQ9Ik0zNzguMTIzLDgzLjc2ODYzYzE0LjMwNTc5LDAgMjYuNjg5NDcsMS43NDczNSAzNi42MzgxNCw0LjM3OTY2djMwLjQ2NjAzYy05Ljc3MzkzLC05Ljk3Njg1IC0yMS4yODM5NCwtMTYuMjg0MjMgLTM2LjQ2OTA1LC0xNi4yODQyM2MtMjcuNzMyMjUsMCAtNDYuMjI2MDYsMTkuNDQwNzYgLTQ2LjIyNjA2LDQ1LjM1ODAyYzAsMjUuOTE3MjYgMTguNDg4MTcsNDUuMzUyMzggNDYuMjMxNyw0NS4zNTIzOGMxNS4xNzk0NywwIDI2LjY4OTQ3LC02LjMwMTc2IDM2LjQ2MzQxLC0xNi4yODQyNXYzMC40NzE2N2MtOS45NDg2NywyLjYyNjY3IC0yMi4zMzIzNSw0LjU0ODc3IC0zNi42MzgxNCw0LjU0ODc3Yy00Ny45NzkwNSwwIC04Mi42OTUxMSwtMjMuOTg5NTMgLTgyLjY5NTExLC02NC4wODg1N2MwLC00MC4xMDQ2NyAzNC43MjE2OCwtNjMuOTE5NDUgODIuNjg5NDcsLTYzLjkxOTQ1ek0yNDEuODY4NTcsMTMzLjUwMDY5YzIzLjg5OTM1LDMuMzI1NjIgNDMuNzg1NCwxMS43MzU0OCA0My43ODU0LDM3LjgyMTgzYzAsMzAuNjUyMDIgLTI4Ljk2MTA0LDQwLjQ1NDE0IC02MC4xODgsNDAuMjg1MDVjLTIxLjgwODE1LC0wLjE4MDM3IC00MC4zMDE5NSwtMi4yNzcyMSAtNTMuOTA4OCwtNy43MTA5MnYtMjcuNDg5ODdjMTkuMzY3NDgsMTIuNjA5MTQgMzkuMjUzNTMsMTYuNjMzNzIgNTMuOTA4OCwxNi42MzM3MmMxNS4xNzk0NywwIDI5LjE0MTQxLC0zLjY3NTA5IDI5LjE0MTQxLC0xNS4yMzAxOWMwLC0xMS41NTUxIC0xMi45MTM1MywtMTQuMzYyMTUgLTM5LjQzMzksLTE4LjM5MjM0Yy0yMi44NTY1NywtMy41MDAzNiAtNDMuNjE2MjksLTEzLjMwODA5IC00My43OTY2NiwtMzUuODk5NzRjLTAuMTYzNDcsLTMwLjQ2NjAzIDI4LjYyMjgzLC0zOS43NDk1NyA1Ni4xODU5OSwtMzkuNzQ5NTdjMTcuODAwNSwwIDM1LjA3MTE1LDIuMTAyNDcgNTAuOTQzOTIsNy4zNTU4MnYyOS41OTIzNGMtMTMuMjU3MzcsLTExLjcyOTg0IC0zMi45NzQzMywtMTguMzg2NyAtNTIuMzM2MTcsLTE4LjM4NjdjLTEzLjA4ODI4LDAgLTI1LjQ3NzYsNC4yMDQ5MyAtMjUuNDc3NiwxNC4wMTI2OGMwLDEyLjI1NDA2IDE4LjMxOTA2LDE0LjAwNzA0IDQxLjE4MTI3LDE3LjE1Nzkyek0xMTAuMzIwNzQsMTkwLjQxMzgxYzE0LjEzMTA1LDAgMzcuNjgwOTIsLTMuMzI1NiA0Ni45MzA2MywtMTEuNTU1MXYzMC4xMTY1NGgtMTAwLjMxNTIyYzQuODgxMzQsLTUuNzc3NTYgNS43NDkzNiwtOS42MzMwMSA1Ljc0OTM2LC0yMS4zNjI4NnYtNzkuODU0MjRjMCwtMTEuNzI5ODQgLTAuODY4MDQsLTE1LjU4NTMgLTUuNzQ5MzYsLTIxLjM2Mjg2aDk1LjA3ODc5djMwLjEyMjE4Yy05LjI0NDA5LC04LjIyOTQ4IC0zMi43OTk2LC0xMS41NTUxIC00Ni45MzA2MywtMTEuNTU1MWgtMTEuMTYwNTR2MzIuNTY4NWg4LjE5NTY2YzguMDI2NTcsMCAyMC40MTAyNywtMC4zNDk0OCAyOC42MTE1NywtMy4zMjU2MnYyNC4xNjQyN2MtOC4yMDEzLC0yLjk3NjE0IC0yMC41ODUsLTMuMzI1NiAtMjguNjExNTcsLTMuMzI1NmgtOC4yMDEzdjM1LjM2OTg5ek0tOTMuNDU0OTYsODYuMzk1MjloMTM3LjY0NjY2djMwLjEyMjE4Yy05Ljc2ODI5LC04LjIyOTQ4IC0zMC41MjgwMSwtMTEuNTU1MSAtNTIuNjgwMDEsLTExLjU1NTF2ODIuMTI1OGMwLDEyLjI1OTY4IDEuMDQyNzgsMTUuNTg1MyA1Ljc1NSwyMS44ODcwNmgtNDMuNzk2NjZjNC43MTc4NiwtNi4zMDE3NiA1Ljc2MDY0LC05LjYzMzAxIDUuNzYwNjQsLTIxLjg4NzA2di04Mi4xMjU4Yy0yMi4xNTE5OCwwIC00Mi45MTczNiwzLjMyNTYyIC01Mi42ODU2NSwxMS41NTUxek01MDEuMTg3NjksMTkzLjA0MDQ4Yy0yNC45NDc3NSwwIC00MS4xNjk5OSwtMjAuNjYzOTEgLTQxLjE2OTk5LC00NS4zNTIzOGMwLC0yNC44Njg4NCAxNi4yMjIyNSwtNDUuMzU4MDIgNDEuMTc1NjMsLTQ1LjM1ODAyYzI0Ljk0MjEyLDAgNDEuMTY5OTksMjAuNDg5MTggNDEuMTY5OTksNDUuMzU4MDJjMCwyNC42ODg0NyAtMTYuMjI3ODksNDUuMzUyMzggLTQxLjE2OTk5LDQ1LjM1MjM4TTUwMS4xOTMzMiw4My43Njg2M2MtNDkuNTUxNjYsMCAtNzcuODEzNzcsMjguODkzMzkgLTc3LjgxMzc3LDYzLjkxOTQ1YzAsMzQuODQ1NjkgMjguMjYyMTEsNjMuOTE5NDcgNzcuODEzNzcsNjMuOTE5NDdjNDkuNTQ2MDQsMCA3Ny44MDgxMywtMjkuMDczNzcgNzcuODA4MTMsLTYzLjkxOTQ3YzAsLTM1LjAyNjA2IC0yOC4yNjIwOSwtNjMuOTE5NDUgLTc3LjgwODEzLC02My45MTk0NSIgZmlsbD0iI2U3MWMyYyIvPjxwYXRoIGQ9Ik00OTQuMzY3MzYsMjQyLjI3NjVoODMuMTIzNDhjMC4wNzg3OCwtMC4wMDEyNCAwLjE1NjUyLDAuMDE4MTggMC4yMjU0NiwwLjA1NjM1bDAuMDIyNTgsMC4wMDU0MmMwLjAyMDQ3LDAuMDEyNzggMC4wMzkzOSwwLjAyNzkxIDAuMDU2MzUsMC4wNDUwOGMwLjE1NzgzLDAuMTU3ODMgMC4xNjkwOSwwLjQ3OTExIC0wLjA3MzI3LDAuNzEwMjFjLTAuMDYyMjYsMC4wNTY5MiAtMC4xMzI1MSwwLjEwNDQgLTAuMjA4NTYsMC4xNDA5MWwtMC4xNDY1NSwwLjA2NzY2Yy05LjY1NTU3LDQuNDE5MTQgLTIyLjU5MTY1LDE3Ljg4NTA3IC0yMi41OTE2NSwxNy44ODUwN2MtOS42NjY4Myw5LjIyMTUzIC0xNi45MTU1NiwxNS4wMzg1NiAtMzIuMzc2ODUsMTUuMDM4NTZoLTc5LjI1MTExYy0wLjI0MjM4LDAuMDA1NDIgLTAuMzU1MTEsLTAuMjE5ODQgLTAuMzcyMDMsLTAuNDQ1MjljMCwwIDAsMC4wMTEyNiAwLDBjMC4wMDE3MywtMC4xNDIyMyAwLjA2MzA3LC0wLjI3NzE5IDAuMTY5MDksLTAuMzcyMDFjMC4wNzg3MSwtMC4wNjUzOSAwLjE2MTU0LC0wLjEyNTY1IDAuMjQ4MDIsLTAuMTgwMzdjOC43MDI5OCwtNC44ODEzNCAyMS42OTU0MSwtMTguMzk3OTggMjEuNjk1NDEsLTE4LjM5Nzk4YzUuMzIwOTksLTYuMzEzMDQgMTUuOTQ2MDUsLTE0LjU1MzggMjkuNDc5NjEsLTE0LjU1MzgiIGZpbGw9IiMwMTNhZGQiLz48cGF0aCBkPSJNMzU4LjkxODk3LDI0Mi4yNzY1aDgzLjEyOTEyYzAuMDc4NzgsLTAuMDAxMjQgMC4xNTY1MiwwLjAxODE4IDAuMjI1NDYsMC4wNTYzNWwwLjAxNjg4LDAuMDA1NDJjMC4wMjA0NywwLjAxMjc4IDAuMDM5MzksMC4wMjc5MSAwLjA1NjM1LDAuMDQ1MDhjMC4xNjM0NSwwLjE1NzgzIDAuMTc0NzMsMC40NzkxMSAtMC4wNzMyOCwwLjcxMDIxYy0wLjA2MDUzLDAuMDU2NDcgLTAuMTI4ODcsMC4xMDM5MiAtMC4yMDI5MiwwLjE0MDkxbC0wLjE0NjU1LDAuMDY3NjZjLTkuNjYxMTMsNC40MTkxNCAtMjIuNTkxNTgsMTcuODg1MDcgLTIyLjU5MTU4LDE3Ljg4NTA3Yy05LjY3MjQ3LDkuMjIxNTMgLTE2LjkxNTU2LDE1LjA0NDE4IC0zMi4zODI0OSwxNS4wNDQxOGgtNzkuMjUxMTFjLTAuMjI1NDgsMCAtMC4zNDk0OCwtMC4yMTk4NCAtMC4zNjA3NSwtMC40NTA5M2MwLDAgMCwwLjAxMTI2IDAsMGMwLjAwMTcxLC0wLjE0MjIzIDAuMDYzMDcsLTAuMjc3MTkgMC4xNjkwOSwtMC4zNzIwMWMwLjA3ODcxLC0wLjA2NTM5IDAuMTYxNTQsLTAuMTI1NjUgMC4yNDgwMiwtMC4xODAzN2M4LjY5NzM0LC00Ljg3NTcgMjEuNjg0MTUsLTE4LjM5MjM0IDIxLjY4NDE1LC0xOC4zOTIzNGM1LjMyMDk5LC02LjMxMzA0IDE1Ljk1MTY5LC0xNC41NTM3OSAyOS40Nzk2LC0xNC41NTM3OSIgZmlsbD0iIzAxM2FkZCIvPjxwYXRoIGQ9Ik0yMjMuNDcwNTksMjQyLjI3NjVoODMuMTI5MTJjMC4wNzg3OCwtMC4wMDEyNCAwLjE1NjUyLDAuMDE4MTggMC4yMjU0NiwwLjA1NjM1bDAuMDIyNTgsMC4wMDU0MmMwLjAyMDQ3LDAuMDEyNzggMC4wMzkzOSwwLjAyNzkxIDAuMDU2MzUsMC4wNDUwOGMwLjE1NzgzLDAuMTU3ODMgMC4xNjkwOSwwLjQ3OTExIC0wLjA3MzI4LDAuNzEwMjFjLTAuMDYwNTMsMC4wNTY0NyAtMC4xMjg4NywwLjEwMzkyIC0wLjIwMjkyLDAuMTQwOTFsLTAuMTUyMTksMC4wNjc2NmMtOS42NTU1Nyw0LjQxOTEyIC0yMi41OTE2NSwxNy44ODUwNSAtMjIuNTkxNjUsMTcuODg1MDVjLTkuNjY2ODMsOS4yMjE1MyAtMTYuOTE1NTYsMTUuMDM4NTQgLTMyLjM3Njg1LDE1LjAzODU0aC03OS4yNTExMWMtMC4yMzY3NCwwIC0wLjM1NTExLC0wLjIxOTg0IC0wLjM2NjM5LC0wLjQ1MDkzYzAsMCAwLDAuMDExMjYgMCwwYzAuMDAxNzEsLTAuMTQyMjMgMC4wNjMwNywtMC4yNzcyMSAwLjE2OTA5LC0wLjM3MjAzYzAuMDc5MTIsLTAuMDY0ODUgMC4xNjE5NCwtMC4xMjUwNyAwLjI0ODAyLC0wLjE4MDM3YzguNjk3MzQsLTQuODc1NyAyMS42ODk3OSwtMTguMzkyMzQgMjEuNjg5NzksLTE4LjM5MjM0YzUuMzIwOTksLTYuMzEzMDQgMTUuOTQ2MDUsLTE0LjU1MzggMjkuNDc5NjEsLTE0LjU1MzgiIGZpbGw9IiMwMDQ1ZTQiLz48cGF0aCBkPSJNODguMDI3ODUsMjQyLjI3NjVoODMuMTIzNDhjMC4wNzg3OCwtMC4wMDEyNCAwLjE1NjUzLDAuMDE4MTggMC4yMjU0OCwwLjA1NjM1bDAuMDIyNTgsMC4wMDU0MmMwLjAyMDQ3LDAuMDEyNzggMC4wMzkzOSwwLjAyNzkxIDAuMDU2MzUsMC4wNDUwOGMwLjE2MzQ1LDAuMTU3ODMgMC4xNzQ3MywwLjQ3OTExIC0wLjA3MzI4LDAuNzEwMjFjLTAuMDYwNTMsMC4wNTY0NyAtMC4xMjg4NywwLjEwMzkyIC0wLjIwMjkyLDAuMTQwOTFsLTAuMTQ2NTUsMC4wNjc2NmMtOS42NjEyMSw0LjQxOTE0IC0yMi41OTE2NSwxNy44ODUwNyAtMjIuNTkxNjUsMTcuODg1MDdjLTkuNjcyNDcsOS4yMjE1MyAtMTYuOTIxMTgsMTUuMDM4NTYgLTMyLjM4MjQ3LDE1LjAzODU2aC03OS4yNTExMWMtMC4yMjU0NiwwIC0wLjM0OTQ3LC0wLjIxOTg0IC0wLjM2MDc1LC0wLjQ1MDkzYzAsMCAwLDAuMDExMjYgMCwwYzAuMDAxNzEsLTAuMTQyMjMgMC4wNjMwNywtMC4yNzcyMSAwLjE2OTA5LC0wLjM3MjAzYzAuMDc4NzEsLTAuMDY1MzkgMC4xNjE1NCwtMC4xMjU2NSAwLjI0ODAyLC0wLjE4MDM3YzguNjk3MzQsLTQuODc1NyAyMS42ODQxNSwtMTguMzkyMzQgMjEuNjg0MTUsLTE4LjM5MjM0YzUuMzIwOTksLTYuMzEzMDQgMTUuOTUxNjksLTE0LjU1MzggMjkuNDc5NjEsLTE0LjU1MzgiIGZpbGw9IiMwMTNhZGQiLz48cGF0aCBkPSJNLTQ3LjQxNDkxLDI0Mi4yNzY1aDgzLjEyMzQ4YzAuMDc4NzgsLTAuMDAxMjQgMC4xNTY1MywwLjAxODE4IDAuMjI1NDgsMC4wNTYzNWwwLjAyMjUxLDAuMDA1NDJjMC4wMjA0NywwLjAxMjc4IDAuMDM5MzksMC4wMjc5MSAwLjA1NjM1LDAuMDQ1MDhjMC4xNTc4MywwLjE1NzgzIDAuMTY5MDksMC40NzkxMSAtMC4wNzMyOCwwLjcxMDIxYy0wLjA2MDUzLDAuMDU2NDcgLTAuMTI4ODcsMC4xMDM5MiAtMC4yMDI5MiwwLjE0MDkxbC0wLjE1MjE5LDAuMDY3NjZjLTkuNjU1NTUsNC40MTkxMiAtMjIuNTkxNjMsMTcuODg1MDUgLTIyLjU5MTYzLDE3Ljg4NTA1Yy05LjY2NjgzLDkuMjIxNTMgLTE2LjkxNTU2LDE1LjAzODU0IC0zMi4zNzY4NSwxNS4wMzg1NGgtNzkuMjUxMDZjLTAuMjQyMzgsMC4wMDU4NiAtMC4zNjA3NSwtMC4yMTk2IC0wLjM2NjM5LC0wLjQ0NTA4YzAsMCAwLDAuMDExMjYgMCwwYzAuMDAxNzMsLTAuMTQyMjMgMC4wNjMwNywtMC4yNzcxOSAwLjE2OTA5LC0wLjM3MjAxYzAuMDc4NzEsLTAuMDY1MzkgMC4xNjE1NCwtMC4xMjU2NSAwLjI0ODAyLC0wLjE4MDM3YzguNjk3MzQsLTQuODc1NyAyMS42ODk3OSwtMTguMzkyMzQgMjEuNjg5NzksLTE4LjM5MjM0YzUuMzIwOTksLTYuMzE4NjYgMTUuOTQwNDEsLTE0LjU1OTQzIDI5LjQ3OTYxLC0xNC41NTk0MyIgZmlsbD0iIzAxM2FkZCIvPjwvZz48L2c+PC9nPjwvc3ZnPg==" alt="">
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Tesco Groceries</span>
+            <span class="bookmark-description">Order groceries online</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark sainsburys" href="https://www.sainsburys.co.uk/gol-ui/groceries">
+          <span class="bookmark-icon" aria-hidden="true">
+            <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzA2IiBoZWlnaHQ9IjU4Ij4KICA8cGF0aCBmaWxsPSIjZjQ3MzIwIiBkPSJNNzMuNjMgOS4wM2MtMi44NiAwLTQuNzctMS43NS00Ljc3LTQuNCAwLTIuMiAxLjU0LTQuMTIgNC43Ny00LjEyIDMuMSAwIDQuNjMgMiA0LjYzIDQuMiAwIDIuNy0xLjc1IDQuNC00LjYzIDQuNE00Ni4yIDQ2LjZjLTYuMTcgMC0xMS40NC0zLjQ4LTExLjQ0LTEwLjEgMC04IDguODgtOS43NSAxMi43Ni0xMC4yNyA2LjM4LS44IDYuOTYtMS4yNCA2Ljk2LTIuOTMgMC0zLjU4LS42NC02LjUtNS4xMy02LjUtMy4wMiAwLTUuNDMuODctNy43NCAyLjI1bC0xLjIuOGMtLjQuMy0xLjEgMS4xLTEuOSAxLjEtLjQgMC0xLjItLjQyLTEuMi0xLjQ3VjE2LjJjMC0uNjguMy0xLjMyIDEuMS0xLjc4IDMtMS40NiA3LjUtMi4yNyAxMS41LTIuMjcgMTAuNCAwIDEzLjUgNC4xIDEzLjUgMTAuMDV2MjIuODJjMCAuNS0uMy44Ni0uOS44NmgtNi43Yy0uMyAwLS43LS4zNS0uNy0uODZsLS4yLTEuOWMtMi4zIDIuMDQtNS4xIDMuNS04LjUgMy41bTguMy0xNy41OGMtOC4xIDAtMTEuMiAzLjY1LTExLjIgNy42MiAwIDIuNzYgMS41IDUuNTcgNS40IDUuNTcgMy40IDAgNS45LTIuNTYgNS45LTMuNTN2LTkuNjZtMTA2LjkgMTcuN2MtNS4yIDAtOS4xLTEuODMtMTEuNy0zLjgtMS4xLS44LTEuMy0yLjItMS4zLTMuNFYxLjc3YzAtLjUyLjQtLjkuNy0uOWg3LjFjLjUgMCAuOS4zOC45Ljl2MTQuNThjMS40LTEuMiA0LjYtMy43NCA5LjYtMy43NCA3LjYgMCAxMi40IDYuNiAxMi40IDE1LjQgMCAxMS4zLTcuOCAxOC44LTE3LjUgMTguOG0tNC42LTYuNmMwIC43LjE4IDEuNCAxIDEuOS43LjUgMS44LjggNCAuOCA0LjY3IDAgNy45OC00LjggNy45OC0xMyAwLTMtLjctMTEuNy03LjM3LTExLjctMi43IDAtNC42IDEuNS01LjcgMi4zdjIwLS4ybTkwIDE3LjdjLS45IDAtMS44IDAtMy4wNC0uMy0uOTUtLjItMS40Ny0uOC0xLjQ3LTEuNVY1MmMwLS41LjQ0LTEgLjk2LTEgLjggMCAxLjQuMiAyLjI0LjQgMS40LjMgMi43LjUgMy45LjUgNC4xIDAgNy4xLTIuMSA3LjItNi4ybC0xMy4zLTMwLjhjLS4zLS44LS40LTEtLjQtMS4yIDAtLjUuMy0uNy43LS43aDhjLjYgMCAuOS4yIDEuMS44bDggMjEgNy43LTIxYy4xLS41LjUtLjggMS0uOGgzLjNjLjMgMCAuNi4zLjYuNyAwIC4zLS4yLjUtLjMuOUwyNjAgNDkuMmMtMS44NyA0LjgtNy4xNSA4Ljc1LTEyLjggOC43NU0xMy4zIDQ2Ljg3Yy00LjA4IDAtOC4zMi0uOS0xMi4wOC0yLjctLjczLS41LS44Ny0uOC0uODctMS41VjM5YzAtLjY3LjIzLTEuMzMgMS40Ny0xLjMzLjY2IDAgMS4xLjM1IDIuMDQgMS4wMyAzLjc3IDIuNjMgNy4zNiAzLjcgMTAuNCAzLjcgNS4xMiAwIDguNi0zLjEgOC42LTYuOTRDMjIuOSAyNS40MyAwIDI4LjUgMCAxMy43IDAgNi44NSA1LjI4Ljg2IDE1LjAzLjg2YzQuODUgMCA5LjI1LjkzIDExLjczIDEuOS42Ny4zLjguNjQuOCAxLjMydjQuMjVjMCAuNjUtLjIgMS4xNi0xIDEuMTYtLjY1IDAtMS4xNy0uNC0xLjk4LTEtMi45My0yLjEtNS43My0zLjQtOS40LTMuNC00LjEgMC03LjMyIDIuMi03LjMyIDUuNiAwIDguNCAyMy4yMyA3LjUgMjMuMjMgMjEgMCAxMC4yLTguNSAxNS0xNy44IDE1bTYzLjktMWgtNy4xYy0uNCAwLS44LS40LS44LS45di0zMWMwLS41LjQtLjkuNy0uOWg3Yy41IDAgLjkuNC45LjlWNDVjMCAuNTMtLjQuODctLjkuODdtMTIwLjYuN2MtNy4zIDAtMTQuNi0zLTE0LjYtMTEuM1YxMy45YzAtLjUuMy0uOS43LS45aDcuMWMuNSAwIC45LjQuOS45VjM3YzAgMy40NCAyLjIgNS41NyA1LjkgNS41NyA0LjUgMCA2LTIuNTQgNi03LjNWMTMuOGMwLS41LjMtLjkuNy0uOWg3Yy41IDAgLjkuNC45Ljl2MjAuNmMwIDkuMS03LjQgMTIuMTYtMTQuNyAxMi4xNm0tODQuMS0uNjJoLTcuMWMtLjQgMC0uNy0uMzgtLjctLjl2LTIyYzAtMi41LS40LTUuNDQtNS4yLTUuNDQtMi41IDAtNS41IDEuNDUtNi45IDIuMjV2MjUuMmMwIC41LS4zLjktLjkuOWgtN2MtLjMzIDAtLjctLjQtLjctLjl2LTMxLjJjMC0uNTQuNC0uOS45Ni0uOWg3Yy41IDAgLjkyLjM2LjkyLjl2MS42N2MyLTEuMzQgNi41LTMuMyAxMC42LTMuMyA3LjEgMCAxMC4yIDQuMSAxMC4yIDEwLjF2MjIuNzNjMCAuNS0uMy45LS45LjltMTcuNC44Yy0zLjUgMC03LjE2LS44NS0xMC0yLjEzLS44NC0uNDMtMS4wNS0xLjA3LTEuMDUtMS44OHYtMi44OGMwLTEuMDMuNS0xLjMzIDEuMi0xLjMzLjUgMCAxIC4yMyAxLjQuNiAzIDIuMjcgNi41IDMuMzcgOS4zIDMuMzcgMy4zIDAgNS43LTEuNCA1LjctNC4xIDAtNi4zLTE4LjQtMy45LTE4LjQtMTUuNTYgMC03LjE0IDYuMS0xMC4zNyAxMy0xMC4zNyAzLjEgMCA2LjMuNjQgOS4zIDEuODcuOS4zNyAxLjEgMS4xIDEuMSAxLjl2Mi40M2MwIDEuMDItLjQgMS4zMi0xLjEgMS4zMi0uMyAwLS45LS4zLTEuNC0uNi0yLjYtMS44LTYuMS0yLjgtOS4xLTIuOHMtNS40IDEuMS01LjQgMy41YzAgNS44IDE4LjggMy4xIDE4LjggMTQuNyAwIDguOC02LjQgMTEuOC0xMy4xIDExLjhtOTUuNS0uOWgtN2MtLjM1IDAtLjctLjQtLjctLjl2LTMxYzAtLjUuMzUtLjkuNy0uOWg2LjhjLjU1IDAgLjkuNC45LjlsLjE1IDMuOWMuMDQgMCAuMDUgMCAuMDYtLjEgMS40LTIuMSA0LjctNS40IDguNzUtNS40Ljk3IDAgMS44IDAgMy4yLjMgMSAuMiAxLjUuOCAxLjUgMS41djQuNmMwIC41LS40NiAxLTEgMS0uOCAwLTEuNS0uMy0yLjQ1LS42LS45NS0uMi0yLjA1LS4zLTMuMTUtLjMtMy40IDAtNi44IDEuMy02LjggNnYxOS44YzAgLjUtLjM1LjktLjg1LjltNTAuNS0zMy4yYy0xLjcuNSAxLjctMy42IDEuMTUtNS44LS42LTIuMS0zLjAzLTUtMS4zLTUuNjYgMS43LS42NyA0LjktLjY2IDUuOC41IDIgMy44NC0uNyAxMC4xNS01LjY3IDEwLjl6TTI5MyA0Ni43Yy0zLjU2IDAtNy4xOC0uODYtMTAtMi4xNC0uODYtLjQtMS4wNy0xLjA1LTEuMDctMS44NnYtMi44NmMwLTEuMDMuNDUtMS4zMyAxLjE3LTEuMzMuNTQgMCAxIC4zIDEuNC42IDIuOTcgMi4zIDYuNDYgMy40IDkuMyAzLjRoLjA0YzMuMjIgMCA1LjctMS40IDUuNy00LjEgMC02LjMtMTguNS0zLjktMTguNS0xNS41IDAtNy4xIDYuMS0xMC4zIDEzLTEwLjMgMy4xIDAgNi4zNi42IDkuMyAxLjkuOS40IDEuMSAxLjEgMS4xIDEuOXYyLjVjMCAxLS40MyAxLjMtMS4yIDEuMy0uMzMgMC0uOTMtLjMtMS4zNi0uNi0yLjYtMS44LTYuMTQtMi44LTkuMDgtMi44LTMgMC01LjQgMS4xLTUuNCAzLjUgMCA1LjggMTguNyAzLjIgMTguNyAxNC44IDAgOC44LTYuNCAxMS45LTEzLjEyIDExLjkiLz4KPC9zdmc+Cg==" alt="">
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Sainsbury's Groceries</span>
+            <span class="bookmark-description">Order groceries online</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark bbc" href="https://www.bbc.co.uk/news">
+          <span class="bookmark-icon" aria-hidden="true">
+            <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNTYwIiBoZWlnaHQ9IjE2MCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgoJCTxnPgoJCQkJPHBhdGggZD0ibTc5LjM5NiA4Ni4xMWgtMTYuMTZ2MjQuM2gxNS45MWM1LjQ2NyAwIDkuNjY2LTEuMDI5IDEyLjYxLTMuMDgzIDIuOTQtMi4wNTggNC40MDMtNS4wMTUgNC40MDMtOC44NzYgMC04LjIyNC01LjU4OS0xMi4zNC0xNi43Ni0xMi4zNHptOC41MDQtMTcuMThjMi40ODUtMi4wNTQgMy43MzQtNC45MjggMy43MzQtOC42MTYgMC03LjEzNi00Ljg2MS0xMC43LTE0LjU3LTEwLjdoLTEzLjgzdjIyLjRoMTMuODNjNC43MzIgMCA4LjM0LTEuMDIyIDEwLjgzLTMuMDh6bS04Ny45IDkxLjA3aDE2MHYtMTYwaC0xNjB6bTExMC44LTQ3LjA4Yy0yLjczNyAzLjg2LTYuNjMyIDYuODQyLTExLjY5IDguOTM4LTUuMDYxIDIuMS0xMS4xNCAzLjE0Ni0xOC4yMyAzLjE0NmgtMzUuODZ2LTkwaDMzLjc3YzkuOTU3IDAgMTcuNjYgMS45OTUgMjMuMTMgNS45NzggNS40NiAzLjk5IDguMTk2IDkuNzE1IDguMTk2IDE3LjE4IDAgNC4yOC0wLjk3OTkgNy45OTQtMi45NCAxMS4xNC0xLjk1NiAzLjE0Ni00Ljg1NCA1LjY0Mi04LjY5IDcuNDkgNS4zMDYgMS43NTcgOS4zNjUgNC41NSAxMi4xOCA4LjM2OCAyLjgxNyAzLjgxOCA0LjIyNCA4LjQ1MiA0LjIyNCAxMy45MSAwIDUuMzcyLTEuMzY1IDkuOTg4LTQuMDk4IDEzLjg0eiIvPgoJCQkJPHBhdGggZD0ibTI3OS4zOTYgODYuMWgtMTYuMTZ2MjQuM2gxNS45MWM1LjQ2NyAwIDkuNjY2LTEuMDI5IDEyLjYtMy4wODMgMi45MzYtMi4wNTggNC40MDMtNS4wMTUgNC40MDMtOC44NzYgMC04LjIyNC01LjU4Ni0xMi4zNC0xNi43Ni0xMi4zNHptOC41MDQtMTcuMThjMi40ODUtMi4wNTQgMy43MzQtNC45MjggMy43MzQtOC42MTYgMC03LjEzNi00Ljg2MS0xMC43LTE0LjU3LTEwLjdoLTEzLjgzdjIyLjRoMTMuODNjNC43MzIgMCA4LjM0NC0xLjAyMiAxMC44My0zLjA4em0tODcuOSA5MS4wOGgxNjB2LTE2MGgtMTYwem0xMTAuOC00Ny4wOGMtMi43MzcgMy44Ni02LjYyOSA2Ljg0Mi0xMS42OSA4LjkzOC01LjA2MSAyLjEtMTEuMTQgMy4xNDYtMTguMjMgMy4xNDZoLTM1Ljg2di05MGgzMy43OGM5Ljk1MyAwIDE3LjY2IDEuOTk1IDIzLjEzIDUuOTc4IDUuNDYgMy45OSA4LjE5NiA5LjcxNSA4LjE5NiAxNy4xOCAwIDQuMjgtMC45Nzk5IDcuOTk0LTIuOTQgMTEuMTQtMS45NTMgMy4xNDYtNC44NTQgNS42NDItOC42ODYgNy40OSA1LjMwNiAxLjc1NyA5LjM2MiA0LjU1IDEyLjE4IDguMzY4IDIuODE0IDMuODE4IDQuMjIxIDguNDUyIDQuMjIxIDEzLjkxIDAgNS4zNzItMS4zNjUgOS45ODgtNC4wOTggMTMuODR6Ii8+CgkJCQk8cGF0aCBkPSJtNDAwIDE2MGgxNjB2LTE2MGgtMTYwem0xMTQuOS00MC43Yy0zLjczMSAyLjA1NC04LjA1IDMuNjgyLTEyLjk2IDQuODc1LTQuOTE0IDEuMTktMTAuMDggMS43ODUtMTUuNSAxLjc4NS03LjE5OSAwLTEzLjY4LTEuMDQ2LTE5LjQzLTMuMTQzLTUuNzY0LTIuMS0xMC42My01LjEyNC0xNC42MS05LjA2OC0zLjk4My0zLjk0OC03LjAzNS04Ljc4NC05LjE0OC0xNC41LTIuMTIxLTUuNzEyLTMuMTc0LTEyLjE1LTMuMTc0LTE5LjMxIDAtNi45ODYgMS4wOTktMTMuMyAzLjMtMTguOTMgMi4yMDUtNS42MzUgNS4zNzYtMTAuNDcgOS41My0xNC41IDQuMTQ3LTQuMDI1IDkuMTItNy4xMTIgMTQuOTMtOS4yNTQgNS43OTktMi4xMzUgMTIuMy0zLjIwNiAxOS40OS0zLjIwNiA0Ljk5OCAwIDkuNzE5IDAuNTE0NSAxNC4xNyAxLjU0IDQuNDQxIDEuMDI5IDguNTY4IDIuNTMgMTIuMzkgNC41MDh2MTcuNTFjLTMuNDg0LTIuMzA2LTcuMjk2LTQuMDcyLTExLjMxLTUuMjM5LTQuMTY5LTEuMjA2LTguNDktMS44MDktMTIuODMtMS43ODgtNi4xODQgMC0xMS40NiAxLjE1MS0xNS44MiAzLjQ1NC00LjI4NyAyLjIyOC03Ljc4OSA1LjcxNy0xMC4wMyA5Ljk5NS0yLjMzNCA0LjM1Ny0zLjUgOS42NTktMy41IDE1LjkxczEuMTIzIDExLjU4IDMuMzcgMTUuOThjMi4xMzIgNC4yOSA1LjU1MSA3LjgwNiA5Ljc3OCAxMC4wNiA0LjI3NyAyLjMwMyA5LjQ2NyAzLjQ1NCAxNS41NiAzLjQ1NCA5LjMxNiAwIDE3LjkxLTIuNDI1IDI1Ljc5LTcuMjh6Ii8+CgkJPC9nPgo8L3N2Zz4K" alt="">
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">BBC News</span>
+            <span class="bookmark-description">Read the latest news</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+      </nav>
+
+      <noscript>
+        <p class="noscript-note">
+          The useful links still work, but the clock and live weather need JavaScript.
+        </p>
+      </noscript>
     </main>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const UK_TIME_ZONE = "Europe/London";
+        const dateElement = document.querySelector("#today");
+        const digitalTimeElement = document.querySelector("#digital-time");
+        const clockFace = document.querySelector("#clock-face");
+        const hourHand = document.querySelector("#hour-hand");
+        const minuteHand = document.querySelector("#minute-hand");
+
+        const dateFormatter = new Intl.DateTimeFormat("en-GB", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: UK_TIME_ZONE
+        });
+
+        const timeFormatter = new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: UK_TIME_ZONE
+        });
+
+        const clockPartsFormatter = new Intl.DateTimeFormat("en-GB", {
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          hour12: false,
+          timeZone: UK_TIME_ZONE
+        });
+
+        function updateClock() {
+          const now = new Date();
+          const parts = Object.fromEntries(
+            clockPartsFormatter.formatToParts(now).map((part) => [part.type, part.value])
+          );
+          const hours = Number(parts.hour) % 12;
+          const minutes = Number(parts.minute);
+          const seconds = Number(parts.second);
+          const hourDegrees = (hours + minutes / 60) * 30;
+          const minuteDegrees = (minutes + seconds / 60) * 6;
+          const readableTime = timeFormatter.format(now);
+
+          dateElement.textContent = dateFormatter.format(now);
+          digitalTimeElement.textContent = readableTime;
+          digitalTimeElement.setAttribute("aria-label", `The time is ${readableTime}`);
+          clockFace.setAttribute("aria-label", `Analogue clock showing ${readableTime}`);
+          hourHand.style.transform = `rotate(${hourDegrees}deg)`;
+          minuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
+        }
+
+        const weatherDescriptions = {
+          0: ["Clear sky", "☀️"],
+          1: ["Mostly clear", "🌤️"],
+          2: ["Partly cloudy", "⛅"],
+          3: ["Cloudy", "☁️"],
+          45: ["Foggy", "🌫️"],
+          48: ["Foggy", "🌫️"],
+          51: ["Light drizzle", "🌦️"],
+          53: ["Drizzle", "🌦️"],
+          55: ["Heavy drizzle", "🌧️"],
+          56: ["Freezing drizzle", "🌧️"],
+          57: ["Freezing drizzle", "🌧️"],
+          61: ["Light rain", "🌦️"],
+          63: ["Rain", "🌧️"],
+          65: ["Heavy rain", "🌧️"],
+          66: ["Freezing rain", "🌧️"],
+          67: ["Freezing rain", "🌧️"],
+          71: ["Light snow", "🌨️"],
+          73: ["Snow", "🌨️"],
+          75: ["Heavy snow", "❄️"],
+          77: ["Snow grains", "🌨️"],
+          80: ["Light showers", "🌦️"],
+          81: ["Showers", "🌧️"],
+          82: ["Heavy showers", "🌧️"],
+          85: ["Snow showers", "🌨️"],
+          86: ["Heavy snow showers", "❄️"],
+          95: ["Thunderstorms", "⛈️"],
+          96: ["Thunderstorms and hail", "⛈️"],
+          99: ["Thunderstorms and hail", "⛈️"]
+        };
+
+        async function updateWeather() {
+          const weatherNow = document.querySelector("#weather-now");
+          const weatherDetail = document.querySelector("#weather-detail");
+          const weatherIcon = document.querySelector("#weather-icon");
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), 8000);
+          const endpoint = new URL("https://api.open-meteo.com/v1/forecast");
+
+          endpoint.search = new URLSearchParams({
+            latitude: "51.6214",
+            longitude: "-3.9436",
+            current: "temperature_2m,weather_code",
+            daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+            temperature_unit: "celsius",
+            timezone: UK_TIME_ZONE,
+            forecast_days: "1"
+          });
+
+          try {
+            const response = await fetch(endpoint, { signal: controller.signal });
+            if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+
+            const forecast = await response.json();
+            const code = forecast.current.weather_code;
+            const [description, icon] = weatherDescriptions[code] || ["Current conditions", "🌡️"];
+            const temperature = Math.round(forecast.current.temperature_2m);
+            const low = Math.round(forecast.daily.temperature_2m_min[0]);
+            const high = Math.round(forecast.daily.temperature_2m_max[0]);
+            const rain = Math.round(forecast.daily.precipitation_probability_max[0]);
+
+            weatherIcon.textContent = icon;
+            weatherNow.textContent = `${temperature}°C — ${description}`;
+            weatherDetail.textContent = `Today: ${low}–${high}°C · Chance of rain ${rain}%`;
+            weatherDetail.className = "weather-detail";
+          } catch (error) {
+            weatherIcon.textContent = "☁️";
+            weatherNow.textContent = "Weather unavailable";
+            weatherDetail.textContent = "Use the BBC forecast link below";
+            weatherDetail.className = "weather-error";
+          } finally {
+            window.clearTimeout(timeout);
+          }
+        }
+
+        updateClock();
+        updateWeather();
+        window.setInterval(updateClock, 1000);
+        window.setInterval(updateWeather, 30 * 60 * 1000);
+      })();
+    </script>
   </body>
 </html>
