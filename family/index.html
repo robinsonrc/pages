@@ -60,7 +60,7 @@
       .page {
         width: min(1500px, calc(100% - 32px));
         margin: 0 auto;
-        padding: 28px 0 40px;
+        padding: 20px 0 32px;
       }
 
       .top-panel {
@@ -78,7 +78,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 26px 30px;
+        padding: 20px 26px;
         background: var(--navy);
         color: #ffffff;
       }
@@ -95,15 +95,15 @@
         display: grid;
         place-items: center;
         align-content: center;
-        gap: 7px;
-        padding: 14px;
+        gap: 5px;
+        padding: 10px 14px;
         background: var(--cream);
         border-right: 2px solid #c5d1d7;
       }
 
       .clock-face {
         position: relative;
-        width: 128px;
+        width: 112px;
         aspect-ratio: 1;
         border: 6px solid var(--navy);
         border-radius: 50%;
@@ -138,11 +138,11 @@
       }
 
       .hour-hand {
-        height: 33px;
+        height: 29px;
       }
 
       .minute-hand {
-        height: 46px;
+        height: 40px;
         width: 4px;
         left: calc(50% - 2px);
         background: #d34a00;
@@ -164,7 +164,7 @@
       .digital-time {
         margin: 0;
         color: var(--navy-dark);
-        font-size: 1.35rem;
+        font-size: 1.2rem;
         font-weight: 800;
         font-variant-numeric: tabular-nums;
         letter-spacing: 0.04em;
@@ -174,16 +174,16 @@
         display: grid;
         grid-template-columns: auto 1fr;
         align-content: center;
-        column-gap: 16px;
-        padding: 22px 26px;
+        column-gap: 14px;
+        padding: 16px 22px;
       }
 
       .weather-icon {
         grid-row: 1 / 4;
         align-self: center;
-        width: 68px;
+        width: 62px;
         text-align: center;
-        font-size: 3.25rem;
+        font-size: 2.85rem;
         line-height: 1;
       }
 
@@ -235,7 +235,7 @@
       .web-search {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
-        margin-top: 26px;
+        margin-top: 18px;
         border: 3px solid var(--navy-dark);
         border-radius: 14px;
         background: var(--paper);
@@ -244,8 +244,8 @@
 
       .search-input {
         min-width: 0;
-        min-height: 72px;
-        padding: 14px 22px;
+        min-height: 64px;
+        padding: 11px 22px;
         border: 0;
         border-radius: 11px 0 0 11px;
         background: var(--paper);
@@ -295,8 +295,9 @@
       .links-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-        margin-top: 18px;
+        grid-auto-rows: 1fr;
+        gap: 14px;
+        margin-top: 14px;
       }
 
       .bookmark {
@@ -304,7 +305,7 @@
         display: grid;
         grid-template-columns: 100px 1fr auto;
         align-items: center;
-        min-height: 106px;
+        min-height: 100px;
         overflow: hidden;
         border: 3px solid var(--border);
         border-left: 12px solid var(--accent);
@@ -375,6 +376,40 @@
       .tesco { --accent: #00539f; }
       .sainsburys { --accent: #b84b00; }
       .bbc { --accent: #bb1919; }
+      .tesco-bank { --accent: #00539f; }
+      .lloyds { --accent: #006a4d; }
+      .halifax { --accent: #0066b3; }
+
+      .bank-wordmark {
+        display: grid;
+        place-items: center;
+        width: 78px;
+        min-height: 52px;
+        padding: 5px;
+        color: var(--accent);
+        font-size: 1rem;
+        font-weight: 900;
+        line-height: 1.05;
+        text-align: center;
+      }
+
+      .tesco-bank .bank-wordmark {
+        color: #e31837;
+        letter-spacing: 0.03em;
+      }
+
+      .tesco-bank .bank-wordmark small {
+        display: block;
+        margin-top: 3px;
+        color: #00539f;
+        font-size: 0.72em;
+        letter-spacing: 0.16em;
+      }
+
+      .lloyds .bank-wordmark,
+      .halifax .bank-wordmark {
+        font-size: 1.05rem;
+      }
 
       .noscript-note {
         max-width: 760px;
@@ -397,11 +432,11 @@
 
       @media (min-width: 1020px) and (min-height: 681px) {
         .top-panel {
-          min-height: clamp(200px, 24vh, 270px);
+          min-height: clamp(154px, 18vh, 185px);
         }
 
         .bookmark {
-          min-height: clamp(112px, 19vh, 200px);
+          min-height: clamp(100px, 13vh, 142px);
         }
 
         .bookmark-title {
@@ -667,6 +702,39 @@
           <span class="bookmark-text">
             <span class="bookmark-title">BBC News</span>
             <span class="bookmark-description">Read the latest news</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark tesco-bank" href="https://www.tescobank.com/online-banking/">
+          <span class="bookmark-icon" aria-hidden="true">
+            <span class="bank-wordmark">TESCO <small>BANK</small></span>
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Tesco Bank Login</span>
+            <span class="bookmark-description">Open online banking</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark lloyds" href="https://online.lloydsbank.co.uk/personal/logon/login.jsp">
+          <span class="bookmark-icon" aria-hidden="true">
+            <span class="bank-wordmark">LLOYDS<br>BANK</span>
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Lloyds Bank Login</span>
+            <span class="bookmark-description">Open internet banking</span>
+          </span>
+          <span class="bookmark-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a class="bookmark halifax" href="https://www.halifax-online.co.uk/personal/logon/login.jsp">
+          <span class="bookmark-icon" aria-hidden="true">
+            <span class="bank-wordmark">Halifax</span>
+          </span>
+          <span class="bookmark-text">
+            <span class="bookmark-title">Halifax Bank Login</span>
+            <span class="bookmark-description">Open online banking</span>
           </span>
           <span class="bookmark-arrow" aria-hidden="true">›</span>
         </a>
